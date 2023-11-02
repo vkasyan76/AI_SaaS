@@ -25,8 +25,10 @@ import { Loader } from "@/components/loader";
 import { amountOptions, resolutionOptions, formSchema } from "./constants";
 import { cn } from "@/lib/utils";
 import { Download, ImageIcon } from "lucide-react";
+import { useProModal } from "@/hooks/use-pro-modal";
 
 const ImagePage = () => {
+  const proModal = useProModal();
   const router = useRouter();
 
   const [images, setImages] = useState<string[]>([]);
@@ -43,19 +45,22 @@ const ImagePage = () => {
   const isLoading = form.formState.isSubmitting;
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    setImages([]);
-
-    const response = await axios.post("/api/image", values);
-
-    const urls = response.data.map((image: { url: string }) => image.url);
-
-    setImages(urls);
-
-    form.reset();
-
     try {
+      setImages([]);
+
+      const response = await axios.post("/api/image", values);
+
+      const urls = response.data.map((image: { url: string }) => image.url);
+
+      setImages(urls);
+
+      form.reset();
     } catch (error: any) {
       // TODO: Open Pro Modal
+      if (error?.response?.status === 403) {
+        // console.log("Trying to open modal");
+        proModal.onOpen();
+      }
       console.log(error);
     } finally {
       // logo image appearing on refresh

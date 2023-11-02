@@ -14,10 +14,12 @@ import { formSchema } from "./constants";
 
 import { Empty } from "@/components/empty";
 import { Loader } from "@/components/loader";
+import { useProModal } from "@/hooks/use-pro-modal";
 
 import { cn } from "@/lib/utils";
 
 const MusicPage = () => {
+  const proModal = useProModal();
   const router = useRouter();
 
   const [music, setMusic] = useState<string>();
@@ -32,15 +34,18 @@ const MusicPage = () => {
   const isLoading = form.formState.isSubmitting;
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    const response = await axios.post("/api/music", values);
-
-    setMusic(response.data.audio);
-
-    form.reset();
-
     try {
+      const response = await axios.post("/api/music", values);
+
+      setMusic(response.data.audio);
+
+      form.reset();
     } catch (error: any) {
       // TODO: Open Pro Modal
+      if (error?.response?.status === 403) {
+        // console.log("Trying to open modal");
+        proModal.onOpen();
+      }
       console.log(error);
     } finally {
       // logo image appearing on refresh

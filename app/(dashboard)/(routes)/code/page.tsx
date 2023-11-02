@@ -20,8 +20,10 @@ import { UserAvatar } from "@/components/user-avatar";
 import { BotAvatar } from "@/components/bot-avatar";
 import { cn } from "@/lib/utils";
 import ReactMarkdown from "react-markdown";
+import { useProModal } from "@/hooks/use-pro-modal";
 
 const CodePage = () => {
+  const proModal = useProModal();
   const router = useRouter();
   const [messages, setMessages] = useState<ChatCompletionMessage[]>([]);
 
@@ -35,25 +37,28 @@ const CodePage = () => {
   const isLoading = form.formState.isSubmitting;
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    // console.log(values);
-    const userMessage: ChatCompletionMessage = {
-      role: "user",
-      content: values.prompt,
-    };
-
-    const newMessages = [...messages, userMessage];
-
-    const response = await axios.post("/api/code", {
-      messages: newMessages,
-    });
-
-    setMessages((current) => [...current, userMessage, response.data]);
-
-    form.reset();
-
     try {
+      // console.log(values);
+      const userMessage: ChatCompletionMessage = {
+        role: "user",
+        content: values.prompt,
+      };
+
+      const newMessages = [...messages, userMessage];
+
+      const response = await axios.post("/api/code", {
+        messages: newMessages,
+      });
+
+      setMessages((current) => [...current, userMessage, response.data]);
+
+      form.reset();
     } catch (error: any) {
       // TODO: Open Pro Modal
+      if (error?.response?.status === 403) {
+        // console.log("Trying to open modal");
+        proModal.onOpen();
+      }
       console.log(error);
     } finally {
       // logo image appearing on refresh

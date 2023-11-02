@@ -15,9 +15,12 @@ import { formSchema } from "./constants";
 import { Empty } from "@/components/empty";
 import { Loader } from "@/components/loader";
 
+import { useProModal } from "@/hooks/use-pro-modal";
+
 import { cn } from "@/lib/utils";
 
 const VideoPage = () => {
+  const proModal = useProModal();
   const router = useRouter();
 
   const [video, setVideo] = useState<string>();
@@ -32,15 +35,18 @@ const VideoPage = () => {
   const isLoading = form.formState.isSubmitting;
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    const response = await axios.post("/api/video", values);
-
-    setVideo(response.data[0]);
-
-    form.reset();
-
     try {
+      const response = await axios.post("/api/video", values);
+
+      setVideo(response.data[0]);
+
+      form.reset();
     } catch (error: any) {
       // TODO: Open Pro Modal
+      if (error?.response?.status === 403) {
+        // console.log("Trying to open modal");
+        proModal.onOpen();
+      }
       console.log(error);
     } finally {
       // logo image appearing on refresh
