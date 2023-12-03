@@ -26,6 +26,7 @@ import { amountOptions, resolutionOptions, formSchema } from "./constants";
 import { cn } from "@/lib/utils";
 import { Download, ImageIcon } from "lucide-react";
 import { useProModal } from "@/hooks/use-pro-modal";
+import toast from "react-hot-toast";
 
 const ImagePage = () => {
   const proModal = useProModal();
@@ -60,8 +61,10 @@ const ImagePage = () => {
       if (error?.response?.status === 403) {
         // console.log("Trying to open modal");
         proModal.onOpen();
+      } else {
+        toast.error("Something went wrong.");
+        console.log(error);
       }
-      console.log(error);
     } finally {
       // logo image appearing on refresh
       router.refresh();

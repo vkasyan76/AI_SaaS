@@ -21,6 +21,7 @@ import { BotAvatar } from "@/components/bot-avatar";
 import { cn } from "@/lib/utils";
 import ReactMarkdown from "react-markdown";
 import { useProModal } from "@/hooks/use-pro-modal";
+import toast from "react-hot-toast";
 
 const CodePage = () => {
   const proModal = useProModal();
@@ -39,6 +40,7 @@ const CodePage = () => {
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
       // console.log(values);
+      // throw new Error("Something");
       const userMessage: ChatCompletionMessage = {
         role: "user",
         content: values.prompt,
@@ -58,8 +60,10 @@ const CodePage = () => {
       if (error?.response?.status === 403) {
         // console.log("Trying to open modal");
         proModal.onOpen();
+      } else {
+        console.log(error);
+        toast.error("Something went wrong.");
       }
-      console.log(error);
     } finally {
       // logo image appearing on refresh
       router.refresh();

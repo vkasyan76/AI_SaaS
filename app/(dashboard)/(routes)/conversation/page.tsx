@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import axios from "axios";
+import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -38,6 +39,7 @@ const ConversationPage = () => {
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
       // console.log(values);
+      // throw new Error("Something");
 
       const userMessage: ChatCompletionMessage = {
         role: "user",
@@ -57,8 +59,10 @@ const ConversationPage = () => {
       // TODO: Open Pro Modal
       if (error?.response?.status === 403) {
         proModal.onOpen();
+      } else {
+        console.log(error);
+        toast.error("Something went wrong.");
       }
-      console.log(error);
     } finally {
       // logo image appearing on refresh
       router.refresh();
