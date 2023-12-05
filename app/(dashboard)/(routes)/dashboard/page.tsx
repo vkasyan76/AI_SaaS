@@ -7,7 +7,7 @@ import { Card } from "@/components/ui/card";
 // import { tools } from "@/constants";
 import { Code, ImageIcon, MessageSquare, Music, VideoIcon } from "lucide-react";
 
-export const tools = [
+const tools = [
   {
     label: "Conversation",
     icon: MessageSquare,
